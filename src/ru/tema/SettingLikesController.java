@@ -210,7 +210,7 @@ public class SettingLikesController implements Initializable {
             Stage stage = new Stage();
             root = FXMLLoader.load(getClass().getResource("Auth.fxml"));
             stage.setTitle("Vk Test");
-            stage.setScene(new Scene(root, 650, 400));
+            stage.setScene(new Scene(root, 650, 430));
             stage.setMaxWidth(650);
             stage.setMinWidth(650);
             stage.setMaxHeight(430);
@@ -338,6 +338,27 @@ public class SettingLikesController implements Initializable {
         }
     }
 
+    private String newLikes(int count)
+    {
+        if(count  == 1){
+            return " новый лайк";
+        }
+
+        if(count % 10 >= 2 && count % 10 <= 4 && (count < 12 || count > 14)){
+            return " новых лайка";
+        }
+
+        return " новых лайков";
+    }
+
+    private String wasSet(int count)
+    {
+        if(count  == 1){
+            return "Был поставлен ";
+        }
+        return "Было поставлено ";
+    }
+
     private void setNewLikes() {
         Task task = new Task<Void>() {
             @Override public Void call() {
@@ -399,7 +420,7 @@ public class SettingLikesController implements Initializable {
                     }
                 }
 
-                updateMessage("Было поставлено " + idstolike.size() + " новых лайков после обновления!");
+                updateMessage(wasSet(idstolike.size()) + idstolike.size() + newLikes(idstolike.size()) + " после обновления!");
                 menuupdate.setDisable(false);
                 return null;
             }
