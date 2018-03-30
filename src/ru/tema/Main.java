@@ -15,7 +15,7 @@ public class Main extends Application {
         //Parent root = FXMLLoader.load(getClass().getResource("Test.fxml"));
         Parent root = FXMLLoader.load(getClass().getResource("Auth.fxml"));
         primaryStage.setTitle("Vk Test");
-        primaryStage.setScene(new Scene(root, 650, 400));
+        primaryStage.setScene(new Scene(root, 650, 430));
         primaryStage.setMaxWidth(650);
         primaryStage.setMinWidth(650);
         primaryStage.setMaxHeight(430);
