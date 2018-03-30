@@ -16,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -33,10 +34,13 @@ import java.util.Vector;
 public class SettingLikesController implements Initializable {
 
     @FXML
-    public BorderPane borderPane;
+    public AnchorPane anchorpane;
 
     @FXML
     public TextField textfield;
+
+    @FXML
+    public MenuBar menuBar;
 
     @FXML
     public ProgressBar progressbar;
@@ -115,14 +119,11 @@ public class SettingLikesController implements Initializable {
             }
         });
 
-        MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(menustart);
         menuBar.getMenus().addAll(menustop);
         menuBar.getMenus().addAll(menuupdate);
         menuBar.getMenus().addAll(menulogout);
         menuBar.getMenus().addAll(menuabout);
-
-        borderPane.setTop(menuBar);
 
         //Reloading textField text
         reload();
@@ -203,7 +204,7 @@ public class SettingLikesController implements Initializable {
             System.out.println("Couldn't save the file");
         }
 
-        Stage currentstage = (Stage) borderPane.getScene().getWindow();
+        Stage currentstage = (Stage) anchorpane.getScene().getWindow();
         Parent root;
         try {
             Stage stage = new Stage();

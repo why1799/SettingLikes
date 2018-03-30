@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane prefHeight="205.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.tema.SettingLikesController">
+<AnchorPane fx:id="anchorpane" prefHeight="205.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.tema.SettingLikesController">
     <children>
         <ProgressBar fx:id="progressbar" layoutX="15.0" layoutY="171.0" prefHeight="20.0" prefWidth="450.0" progress="0.0" />
         <TextField fx:id="textfield" layoutX="15.0" layoutY="62.0" prefHeight="26.0" prefWidth="450.0" />
@@ -14,6 +14,8 @@
         <Label fx:id="groupnamelabel" alignment="CENTER" layoutX="16.0" layoutY="95.0" prefHeight="16.0" prefWidth="450.0" text="Название группы" />
       <Label fx:id="progresslabel" alignment="CENTER" layoutX="15.0" layoutY="149.0" prefHeight="16.0" prefWidth="450.0" text="Осталось столько-то времени" />
       <Label fx:id="likeschangerlabel" alignment="CENTER" layoutX="9.0" layoutY="126.0" prefHeight="16.0" prefWidth="450.0" text="Было поставленно 2 новых лайка после обновления!" />
-      <BorderPane fx:id="borderPane" layoutX="1.0" prefHeight="33.0" prefWidth="480.0" />
+      <MenuBar fx:id="menuBar" layoutY="2.0" prefHeight="26.0" prefWidth="480.0">
+        
+      </MenuBar>
     </children>
 </AnchorPane>
