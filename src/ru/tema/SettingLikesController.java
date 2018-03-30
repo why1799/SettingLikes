@@ -40,7 +40,7 @@ public class SettingLikesController implements Initializable {
     public TextField textfield;
 
     @FXML
-    public MenuBar menuBar;
+    public BorderPane borderpane;
 
     @FXML
     public ProgressBar progressbar;
@@ -119,11 +119,14 @@ public class SettingLikesController implements Initializable {
             }
         });
 
+        MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(menustart);
         menuBar.getMenus().addAll(menustop);
         menuBar.getMenus().addAll(menuupdate);
         menuBar.getMenus().addAll(menulogout);
         menuBar.getMenus().addAll(menuabout);
+
+        borderpane.setTop(menuBar);
 
         //Reloading textField text
         reload();

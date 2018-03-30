@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" name="SettingLikes">
+  <artifact type="javafx" build-on-make="true" name="SettingLikes">
     <output-path>$PROJECT_DIR$/out/artifacts/SettingLikes</output-path>
     <root id="root">
       <element id="archive" name="SettingLikes.jar">

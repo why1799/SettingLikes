@@ -105,7 +105,7 @@ public class AuthController implements Initializable{
                 root = FXMLLoader.load(getClass().getResource("SettingLikes.fxml"));
                 Stage stage = new Stage();
                 stage.setTitle("Setting Likes");
-                stage.setScene(new Scene(root, 490, 250));
+                stage.setScene(new Scene(root, 490, 205));
                 stage.setMaxWidth(490);
                 stage.setMinWidth(490);
                 stage.setMaxHeight(250);
