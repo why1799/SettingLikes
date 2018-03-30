@@ -213,7 +213,7 @@ public class SettingLikesController implements Initializable {
             Stage stage = new Stage();
             root = FXMLLoader.load(getClass().getResource("Auth.fxml"));
             stage.setTitle("Vk Test");
-            stage.setScene(new Scene(root, 650, 430));
+            stage.setScene(new Scene(root, 650, 400));
             stage.setMaxWidth(650);
             stage.setMinWidth(650);
             stage.setMaxHeight(430);

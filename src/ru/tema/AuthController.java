@@ -108,8 +108,8 @@ public class AuthController implements Initializable{
                 stage.setScene(new Scene(root, 490, 205));
                 stage.setMaxWidth(490);
                 stage.setMinWidth(490);
-                stage.setMaxHeight(250);
-                stage.setMinHeight(250);
+                stage.setMaxHeight(240);
+                stage.setMinHeight(240);
                 stage.show();
                 System.out.println("Setting Likes window started");
                 currentstage.hide();
