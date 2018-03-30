@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -47,11 +48,7 @@ public class SettingLikesController implements Initializable {
 
     private String lastpost, groupid;
 
-    private Boolean setlikes, waitforcheck, stopprog, update;
-
-    private String messageupdate;
-
-    private long workdoneupdate, maxupdate;
+    private Boolean stopprog, update;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -130,15 +127,8 @@ public class SettingLikesController implements Initializable {
         //Reloading textField text
         reload();
 
-        waitforcheck = false;
-        setlikes = false;
         stopprog = false;
         update = false;
-
-        messageupdate = "";
-        workdoneupdate = maxupdate = 0;
-
-
         lastpost = "";
 
         groupnamelabel.setText("");
@@ -179,10 +169,7 @@ public class SettingLikesController implements Initializable {
 
         System.out.println(lastpost);
 
-        waitforcheck = true;
         waitForTheNextCheck();
-        setNewLikes();
-        updater();
     }
 
     private void stop(){
@@ -190,7 +177,6 @@ public class SettingLikesController implements Initializable {
         menuupdate.setDisable(true);
         textfield.setDisable(false);
         menustart.setDisable(false);
-        waitforcheck = false;
         stopprog = true;
     }
 
@@ -351,108 +337,88 @@ public class SettingLikesController implements Initializable {
         }
     }
 
-    private void updater(){
-        Task task = new Task<Void>() {
-            @Override public Void call() {
-                synchronized(this) {
-                    while (!stopprog){
-                        updateProgress(workdoneupdate, maxupdate);
-                        updateMessage(messageupdate);
-                    }
-                    return null;
-                }
-            }
-        };
-
-
-        progresslabel.textProperty().bind(task.messageProperty());
-        progressbar.progressProperty().bind(task.progressProperty());
-
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
-    }
-
     private void setNewLikes() {
         Task task = new Task<Void>() {
             @Override public Void call() {
-                while(!stopprog) {
-                    synchronized(this){
-                        if (setlikes) {
-                            menuupdate.setDisable(true);
+                menuupdate.setDisable(true);
+                updateProgress(0, 100);
 
-                            String code = "https://api.vk.com/method/wall.get.xml?owner_id=-" + groupid + "&count=1000&filter=owner&access_token=" + Pass.token + Pass.version;
-                            String data = Get.get(code);
+                String code = "https://api.vk.com/method/wall.get.xml?owner_id=-" + groupid + "&count=1000&filter=owner&access_token=" + Pass.token + Pass.version;
+                String data = Get.get(code);
 
-                            String oldlastpost = lastpost;
+                String oldlastpost = lastpost;
 
-                            updatelastpost(data);
+                updatelastpost(data);
 
-                            Vector<String> idstolike = new Vector<String>();
+                Vector<String> idstolike = new Vector<String>();
 
-                            if(getFromKey("count", data).compareTo("0") != 0){
-                                int st = 0;
+                if(getFromKey("count", data).compareTo("0") != 0){
+                    int st = 0;
 
-                                while(st != -3)
-                                {
-                                    String newid = getFromKey("id", data, st);
+                    while(st != -3)
+                    {
+                        String newid = getFromKey("id", data, st);
 
-                                    if(st == 0){
-                                        st = data.indexOf("<id>", st) - 2;
-                                    }
+                        if(st == 0){
+                            st = data.indexOf("<id>", st) - 2;
+                        }
 
-                                    if (Integer.parseInt(newid) <= Integer.parseInt(oldlastpost) && st == 0){
-                                        st = data.indexOf("<id>", st + 3) - 2;
-                                        continue;
-                                    }
+                        if (Integer.parseInt(newid) <= Integer.parseInt(oldlastpost) && st == 0){
+                            st = data.indexOf("<id>", st + 3) - 2;
+                            continue;
+                        }
 
-                                    if(Integer.parseInt(newid) <= Integer.parseInt(oldlastpost)){
-                                        break;
-                                    }
+                        if(Integer.parseInt(newid) <= Integer.parseInt(oldlastpost)){
+                            break;
+                        }
 
-                                    idstolike.add(newid);
-                                    st = data.indexOf("<id>", st + 3) - 2;
+                        idstolike.add(newid);
+                        st = data.indexOf("<id>", st + 3) - 2;
 
-                                }
-                            }
+                    }
+                }
 
-                            if(idstolike.size() != 0){
-                                updateMessage("Ставятся лайки");
-                            }
+                if(idstolike.size() != 0){
+                    updateMessage("Ставятся лайки");
+                }
 
-                            for(int i = 0; i < idstolike.size() && !stopprog; ++i) {
-                                messageupdate = (i + 1) + " из " + idstolike.size();
-                                workdoneupdate = i + 1;
-                                maxupdate = idstolike.size();
+                for(int i = 0; i < idstolike.size() && !stopprog; ++i) {
+                    updateTitle((i + 1) + " из " + idstolike.size());
+                    updateProgress(i + 1, idstolike.size());
 
-                                code = "https://api.vk.com/method/likes.add.xml?type=post&owner_id=-" + groupid + "&item_id=" + idstolike.elementAt(i) + "&filter=owner&access_token=" + Pass.token + Pass.version;
-                                data = Get.get(code);
+                    code = "https://api.vk.com/method/likes.add.xml?type=post&owner_id=-" + groupid + "&item_id=" + idstolike.elementAt(i) + "&filter=owner&access_token=" + Pass.token + Pass.version;
+                    data = Get.get(code);
 
-                                if (data.indexOf("<error_code>") != -1) {
-                                    try {
-                                        i--;
-                                        Thread.sleep(500);
-                                    } catch (Exception ex) {
-                                    }
-                                }
-                            }
-                            if(stopprog){
-                                return null;
-                            }
-
-                            updateMessage("Было поставленно " + idstolike.size() + " новых лайков после обновления!");
-                            setlikes = false;
-                            waitforcheck = true;
-
-                            menuupdate.setDisable(false);
+                    if (data.indexOf("<error_code>") != -1) {
+                        try {
+                            i--;
+                            Thread.sleep(500);
+                        } catch (Exception ex) {
                         }
                     }
                 }
+
+                updateMessage("Было поставлено " + idstolike.size() + " новых лайков после обновления!");
+                menuupdate.setDisable(false);
                 return null;
             }
         };
 
+        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                if(!stopprog){
+                    waitForTheNextCheck();
+                }
+                else{
+                    menuupdate.setDisable(true);
+                }
+            }
+        });
+
         likeschangerlabel.textProperty().bind(task.messageProperty());
+        progresslabel.textProperty().bind(task.titleProperty());
+        progressbar.progressProperty().bind(task.progressProperty());
 
         Thread thread = new Thread(task);
         thread.setDaemon(true);
@@ -461,55 +427,42 @@ public class SettingLikesController implements Initializable {
 
     private void waitForTheNextCheck() {
 
-        /*long sec = 5;
-        long milisec = sec * 1000;*/
+        //long sec = 10;
 
         long min = 30;
-        long milisec = min * 60 * 1000;
+        long sec = min * 60;
 
         Task task = new Task<Void>() {
-            @Override public Void call() {
-                while (!stopprog) {
-                    synchronized(this){
-                        if (waitforcheck) {
-                            long time1 = System.currentTimeMillis(), time2;
-                            while (!stopprog) {
-                                time2 = System.currentTimeMillis();
-                                if (isCancelled()) {
-                                    break;
-                                }
-
-                                long diff = time2 - time1;
-
-                                if(update){
-                                    diff = milisec;
-                                    update = false;
-                                }
-
-                                if (diff >= milisec) {
-                                    diff = milisec;
-                                    break;
-                                }
-
-                                workdoneupdate = diff;
-                                maxupdate = milisec;
-
-                                diff = milisec - diff;
-                                long diffSeconds = diff / 1000 % 60;
-                                long diffMinutes = diff / (60 * 1000) % 60;
-
-                                messageupdate = "До следующей проверки: " + diffMinutes + ":" + (diffSeconds / 10) % 10 + "" + diffSeconds % 10;
-                                if(stopprog)
-                                    return null;
-                            }
-                            waitforcheck = false;
-                            setlikes = true;
-                        }
+            @Override public Void call() throws InterruptedException {
+                for(long i = 0 ; i <= sec && !stopprog; i++){
+                    if(i != 0){
+                        Thread.sleep(1000);
                     }
+                    if(update){
+                        i = sec;
+                        update = false;
+                    }
+                    long diff = sec - i;
+                    long diffSeconds = diff % 60;
+                    long diffMinutes = (diff / 60) % 60;
+                    updateProgress((double) i, (double)sec);
+                    updateMessage("До следующей проверки: " + diffMinutes + ":" + (diffSeconds / 10) % 10 + "" + diffSeconds % 10);
                 }
                 return null;
             }
         };
+
+        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                if(!stopprog){
+                    setNewLikes();
+                }
+            }
+        });
+
+        progresslabel.textProperty().bind(task.messageProperty());
+        progressbar.progressProperty().bind(task.progressProperty());
 
         Thread thread = new Thread(task);
         thread.setDaemon(true);
